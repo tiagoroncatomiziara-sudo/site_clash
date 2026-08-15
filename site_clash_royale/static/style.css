@@ -112,7 +112,12 @@ button:hover {
 .voltar:hover {
     transform: scale(1.05);
 }
-
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #eeeeee;
+}
 @media (max-width: 700px) {
 
     .deck {
