@@ -1,65 +1,73 @@
-from flask import Flask, render_template, request
 import random
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Cartas (em inglês para funcionar com imagens)
+# Cartas com tipo
 cartas = {
-    "Giant": 5,
-    "Hog Rider": 4,
-    "Balloon": 5,
-    "Golem": 8,
-    "P.E.K.K.A": 7,
-    "Miner": 3,
-    "X-Bow": 6,
-    "Mortar": 4,
+    "Giant": {"elixir": 5, "tipo": "tank"},
+    "Golem": {"elixir": 8, "tipo": "tank"},
+    "P.E.K.K.A": {"elixir": 7, "tipo": "tank"},
 
-    "Knight": 3,
-    "Valkyrie": 4,
-    "Mini P.E.K.K.A": 4,
-    "Prince": 5,
+    "Hog Rider": {"elixir": 4, "tipo": "win"},
+    "Balloon": {"elixir": 5, "tipo": "win"},
+    "X-Bow": {"elixir": 6, "tipo": "win"},
 
-    "Archers": 3,
-    "Musketeer": 4,
-    "Baby Dragon": 4,
-    "Minions": 3,
-    "Bats": 2,
+    "Musketeer": {"elixir": 4, "tipo": "air"},
+    "Baby Dragon": {"elixir": 4, "tipo": "air"},
+    "Minions": {"elixir": 3, "tipo": "air"},
 
-    "Zap": 2,
-    "Arrows": 3,
-    "Snowball": 2,
-    "The Log": 2,
+    "Knight": {"elixir": 3, "tipo": "support"},
+    "Valkyrie": {"elixir": 4, "tipo": "support"},
+    "Mini P.E.K.K.A": {"elixir": 4, "tipo": "support"},
 
-    "Fireball": 4,
-    "Poison": 4,
-    "Rocket": 6,
-
-    "Cannon": 3,
-    "Tesla": 4,
-
-    "Skeletons": 1,
-    "Goblins": 2,
-    "Ice Spirit": 1
+    "Fireball": {"elixir": 4, "tipo": "spell"},
+    "Zap": {"elixir": 2, "tipo": "spell"},
+    "Arrows": {"elixir": 3, "tipo": "spell"},
 }
+
+def gerar_deck_inteligente(elixir_desejado):
+    melhores_deck = None
+    menor_diferenca = float("inf")
+
+    for _ in range(3000):
+
+        deck = []
+
+        # garante estrutura
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "win"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "tank"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "support"], 2)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "air"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "spell"], 2)
+
+        # completa até 8 cartas
+        while len(deck) < 8:
+            carta = random.choice(list(cartas.keys()))
+            if carta not in deck:
+                deck.append(carta)
+
+        # calcula média
+        media = sum(cartas[c]["elixir"] for c in deck) / 8
+        diferenca = abs(media - elixir_desejado)
+
+        if diferenca < menor_diferenca:
+            menor_diferenca = diferenca
+            melhores_deck = deck
+
+    return melhores_deck
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-
     if request.method == "POST":
-        elixir_desejado = float(request.form["elixir"])
+        elixir = float(request.form["elixir"])
+        deck = gerar_deck_inteligente(elixir)
 
-        deck = random.sample(list(cartas.keys()), 8)
-
-        media = sum(cartas[c] for c in deck) / 8
-
-        return render_template(
-            "criar_deck.html",
-            deck=deck,
-            cartas=cartas,
-            elixir_medio=round(media, 2)
-        )
+        return render_template("criar_deck.html", deck=deck, cartas=cartas)
 
     return render_template("index.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
