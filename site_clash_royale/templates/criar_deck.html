@@ -1,48 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Seu Deck</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>⚔️ Seu Deck Está Pronto!</h1>
+    <h1>🃏 Seu Deck</h1>
 
-        <p>Estas são as 8 cartas que o gerador escolheu:</p>
+    <p>Elixir médio: {{ elixir_medio }}</p>
 
-        <div class="deck">
+    <div class="deck">
 
-            {% for carta in deck %}
+        {% for carta in deck %}
+        <div class="card">
 
-                <div class="card">
+            <img src="https://royaleapi.github.io/cr-api-assets/cards/{{ carta|lower|replace(' ', '')|replace('.', '') }}.png">
 
-                    <h2>{{ carta }}</h2>
+            <h2>{{ carta }}</h2>
 
-                    <p>
-                        💧 {{ cartas[carta] ["elixir"}} de elixir
-                    </p>
-
-                </div>
-
-            {% endfor %}
+            <p>💧 {{ cartas[carta] }}</p>
 
         </div>
-
-        <a href="/" class="voltar">
-            ← Criar outro deck
-        </a>
+        {% endfor %}
 
     </div>
 
-</body>
-<footer> Site criado por Tiago Roncato </footer>
-</html>
+    <a href="/" class="voltar">Voltar</a>
 
+</div>
+
+<footer>Site criado por Tiago Roncato</footer>
+
+</body>
+</html>
