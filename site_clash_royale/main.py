@@ -137,12 +137,12 @@ def avaliar_deck(deck, cartas):
     tipos = [cartas[n]['tipo'] for n in deck]
 
     if 'win' in tipos:
-        nota += 2.3
+        nota += 2.1
     else:
         nota -= 2
 
     if 'defense' in tipos:
-        nota += 2.4
+        nota += 2.3
     else:
         nota -= 2   # CORRIGIDO
 
@@ -157,15 +157,16 @@ def avaliar_deck(deck, cartas):
         nota -= 1
 
     if 'spell' in tipos:
-        nota += 1
+        nota += 0.8
     else:
         nota -= 0.5
 
     media = sum(cartas[n]['elixir'] for n in deck) / len(deck)
 
     if 2 <= media <= 4:
-        nota += 1.5
-
+        nota += 0.3
+    else:
+        nota -= 1
     return round(nota, 1), round(media, 1)
 
 #======================ROTAS=============================
