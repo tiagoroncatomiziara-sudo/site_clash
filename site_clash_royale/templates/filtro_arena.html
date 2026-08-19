@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filtrar por Arena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ Filtrar Deck por Arena</h1>
+
+        <form method="POST" action="/arena">
+            <label>Arena:</label>
+
+            <select name="arena" required>
+                <option value="1">Arena 1</option>
+                <option value="2">Arena 2</option>
+                <option value="3">Arena 3</option>
+                <option value="4">Arena 4</option>
+                <option value="5">Arena 5</option>
+                <option value="6">Arena 6</option>
+                <option value="7">Arena 7</option>
+                <option value="8">Arena 8</option>
+                <option value="9">Arena 9</option>
+                <option value="10">Arena 10</option>
+                <option value="11">Arena 11</option>
+                <option value="12">Arena 12</option>
+                <option value="13">Arena 13</option>
+                <option value="14">Arena 14</option>
+                <option value="15">Arena 15</option>
+                <option value="16">Arena 16</option>
+                <option value="17">Arena 17</option>
+                <option value="18">Arena 18</option>
+                <option value="19">Arena 19</option>
+                <option value="20">Arena 20</option>
+                <option value="21">Arena 21</option>
+                <option value="22">Arena 22</option>
+                <option value="23">Arena 23</option>
+                <option value="24">Arena 24</option>
+                <option value="25">Arena 25</option>
+                <option value="26">Arena 26</option>
+                <option value="27">Arena 27</option>
+                <option value="28">Arena 28</option>
+            </select>
+
+            <button type="submit">Filtrar</button>
+        </form>
+    </div>
+</body>
+</html>
