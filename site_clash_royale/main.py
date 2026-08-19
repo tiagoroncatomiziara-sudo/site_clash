@@ -101,108 +101,183 @@ cartas = {
 #==========================gerador===========================
 
 def gerar_deck_inteligente(elixir_desejado):
-    melhores_deck = None
-    menor_diferenca = float("inf")
+    melhor_deck = None
+    melhor_nota = -1
 
-    for _ in range(3000):
+    for _ in range(4000):
+
         deck = []
 
-        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "defense"], 1)
+        # garante estrutura básica REAL
         deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "win"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "defense"], 1)
         deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "tank"], 1)
-        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "support"], 1)
-        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "air"], 1)
         deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "spell"], 1)
         deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "cycle"], 1)
-        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "swarm"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "support"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "air"], 1)
+        deck += random.sample([c for c in cartas if cartas[c]["tipo"] == "win"], 1)
+
+        # garante 8 cartas únicas
+        deck = list(set(deck))
 
         while len(deck) < 8:
-            carta = random.choice(list(cartas.keys()))
-            if carta not in deck:
-                deck.append(carta)
+            c = random.choice(list(cartas.keys()))
+            if c not in deck:
+                deck.append(c)
 
-        media = sum(cartas[c]["elixir"] for c in deck) / 8
-        diferenca = abs(media - elixir_desejado)
+        nota, media = avaliar_deck(deck, cartas)
 
-        if diferenca < menor_diferenca:
-            menor_diferenca = diferenca
-            melhores_deck = deck
+        # bônus por bater elixir desejado
+        bonus = max(0, 2 - abs(media - elixir_desejado))
+        nota += bonus
 
-    return melhores_deck
+        if nota > melhor_nota:
+            melhor_nota = nota
+            melhor_deck = deck
 
+    return melhor_deck
 #======================avaliador=============================
 
 def avaliar_deck(deck, cartas):
-    nota = 0
-    tipos = [cartas[n]['tipo'] for n in deck]
+    tipos = [cartas[c]["tipo"] for c in deck]
+    elixires = [cartas[c]["elixir"] for c in deck]
 
-    if 'win' in tipos:
-        nota += 2.1
+    score = 0
+
+    # =========================
+    # ⚡ ELIXIR CURVE (0 a 3 pts)
+    # =========================
+    media = sum(elixires) / 8
+
+    if 2.6 <= media <= 3.6:
+        score += 3
+    elif 3.6 < media <= 4.2:
+        score += 2
+    elif 2.2 <= media < 2.6:
+        score += 1
     else:
-        nota -= 2
+        score -= 2
 
-    if 'defense' in tipos:
-        nota += 2.3
+    # =========================
+    # 🎯 WIN CONDITION (0 a 3 pts)
+    # =========================
+    win = tipos.count("win")
+
+    if win == 1:
+        score += 3
+    elif win == 2:
+        score += 2
+    elif win == 0:
+        score -= 3
     else:
-        nota -= 2   # CORRIGIDO
+        score -= 2
 
-    if 'support' in tipos:
-        nota += 1.4
+    # =========================
+    # 🧱 DEFESA (0 a 2 pts)
+    # =========================
+    defense = tipos.count("defense")
+
+    if defense == 1:
+        score += 2
+    elif defense == 2:
+        score += 1
+    elif defense == 0:
+        score -= 2
+    elif defense >= 4:
+        score -= 2
+
+    # =========================
+    # 🔥 SPELL BALANCE (0 a 2 pts)
+    # =========================
+    spell = tipos.count("spell")
+
+    if spell == 1:
+        score += 2
+    elif spell == 2:
+        score += 1
+    elif spell == 0:
+        score -= 2
+    elif spell >= 4:
+        score -= 2
+
+    # =========================
+    # 🔁 CYCLE (0 a 1.5 pts)
+    # =========================
+    cycle = tipos.count("cycle")
+
+    if cycle >= 2:
+        score += 1.5
+    elif cycle == 1:
+        score += 0.5
     else:
-        nota -= 1
+        score -= 1
 
-    if 'air' in tipos:
-        nota += 1.2
+    # =========================
+    # 🛡️ TANK (0 a 1.5 pts)
+    # =========================
+    tank = tipos.count("tank")
+
+    if tank == 1:
+        score += 1.5
+    elif tank == 0:
+        score -= 1
+
+    # =========================
+    # 🌬️ AIR COVER (0 a 1.5 pts)
+    # =========================
+    if "air" in tipos:
+        score += 1.5
     else:
-        nota -= 1
+        score -= 1
 
-    if 'spell' in tipos:
-        nota += 0.8
-    else:
-        nota -= 0.5
-    if 'cycle' in tipos:
-        nota += 0.5
-    else:
-        nota -= 0.5
+    # =========================
+    # 💥 PRESSÃO OFFENSIVA (0 a 1.5 pts)
+    # =========================
+    pressure = sum(1 for c in deck if cartas[c]["tipo"] in ["win", "tank", "support"])
 
-    if 'swarm' in tipos:
-        nota += 0.5
-    else:
-        nota -= 0.5
+    if pressure >= 5:
+        score += 1.5
+    elif pressure <= 3:
+        score -= 1
 
-    if 'tank' in tipos:
-        nota += 1.5
-    else:
-        nota -= 1
+    # =========================
+    # ⚠️ OVERLOAD DE ELIXIR (penalidade forte)
+    # =========================
+    caros = sum(1 for c in deck if cartas[c]["elixir"] >= 6)
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'win') <=3 or sum(1 for n in deck if cartas[n]['tipo'] == 'win') >= 5:
-        nota -=0.6
+    if caros >= 4:
+        score -= 2.5
+    elif caros == 3:
+        score -= 1
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'defense') >=5:
-        nota -=0.7
+    # =========================
+    # 🧬 VARIEDADE (anti deck lixo)
+    # =========================
+    unique_types = len(set(tipos))
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'defense') <=5:
-        nota += 0.2
+    if unique_types >= 6:
+        score += 1
+    elif unique_types <= 3:
+        score -= 2
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'support') >=5:
-        nota -=0.3
+    # =========================
+    # 🎲 MICRO VARIAÇÃO (evita empate)
+    # =========================
+    import random
+    score += random.uniform(-0.1, 0.1)
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'support') <=5:
-        nota += 0.2
+    # =========================
+    # 📊 NORMALIZAÇÃO FINAL (0–10)
+    # =========================
+    if score < 0:
+        score = 0
+    if score > 12:
+        score = 12
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'spell') >=5:
-        nota -=0.3
+    nota_final = (score / 12) * 10
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'spell') <=5:
-        nota += 0.2
-
-    media = sum(cartas[n]['elixir'] for n in deck) / len(deck)
-
-    if 2 <= media <= 4:
-        nota += 0.3
-    else:
-        nota -= 1
-    return round(nota, 1), round(media, 1)
+    return round(nota_final, 1), round(media, 2)
 
 #======================ROTAS=============================
 
