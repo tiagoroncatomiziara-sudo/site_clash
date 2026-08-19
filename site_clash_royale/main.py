@@ -160,6 +160,41 @@ def avaliar_deck(deck, cartas):
         nota += 0.8
     else:
         nota -= 0.5
+    if 'cycle' in tipos:
+        nota += 0.5
+    else:
+        nota -= 0.5
+
+    if 'swarm' in tipos:
+        nota += 0.5
+    else:
+        nota -= 0.5
+
+    if 'tank' in tipos:
+        nota += 1.5
+    else:
+        nota -= 1
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'win') <=3 or sum(1 for n in deck if cartas[n]['tipo'] == 'win') >= 5:
+        nota -=0.6
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'defense') >=5:
+        nota -=0.7
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'defense') <=5:
+        nota += 0.2
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'support') >=5
+        nota -=0.3
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'support') <=5:
+        nota += 0.2
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'spell') >=5:
+        nota -=0.3
+
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'spell') <=5:
+        nota += 0.2
 
     media = sum(cartas[n]['elixir'] for n in deck) / len(deck)
 
