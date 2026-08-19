@@ -11,7 +11,9 @@
 
     <h1>🃏 Seu Deck</h1>
 
-    <p>Elixir médio: {{ elixir_medio }}</p>
+    <h2>⭐ Nota do deck: {{ nota }}/10</h2>
+
+    <p>💧 Elixir médio: {{ media }}</p>
 
     <div class="deck">
 
@@ -23,13 +25,13 @@
             <h2>{{ carta }}</h2>
 
             <p>💧 {{ cartas[carta]["elixir"] }}</p>
+
         </div>
         {% endfor %}
 
     </div>
 
     <a href="/" class="voltar">Voltar</a>
-
 </div>
 
 <footer>Site criado por Tiago Roncato</footer>
