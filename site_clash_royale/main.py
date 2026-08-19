@@ -184,7 +184,7 @@ def avaliar_deck(deck, cartas):
     if sum(1 for n in deck if cartas[n]['tipo'] == 'defense') <=5:
         nota += 0.2
 
-    if sum(1 for n in deck if cartas[n]['tipo'] == 'support') >=5
+    if sum(1 for n in deck if cartas[n]['tipo'] == 'support') >=5:
         nota -=0.3
 
     if sum(1 for n in deck if cartas[n]['tipo'] == 'support') <=5:
